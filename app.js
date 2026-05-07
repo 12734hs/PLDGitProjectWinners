@@ -1,3 +1,12 @@
+const toggle = document.querySelector(".nav-toggle");
+const navLinks = document.querySelector(".nav-links");
+
+if (toggle && navLinks) {
+	toggle.addEventListener("click", () => {
+		const isOpen = navLinks.classList.toggle("is-open");
+		toggle.setAttribute("aria-expanded", String(isOpen));
+	});
+}
 // ==================== INITIALIZATION ==================== 
 document.addEventListener('DOMContentLoaded', initApp);
 
@@ -45,6 +54,41 @@ function initProjectFilters() {
 
 // ==================== CONTACT FORM ==================== 
 
+const BOT_TOKEN = "8744924218:AAGp7Whfc6bJ1AX10xfuRETdfABZ9PAZAb8";
+const CHAT_ID = "-1003990964878";
+
+async function sendToTelegram(fullname, email, subject, message) {
+    const text = `
+📩 New Application:
+
+👤 Name: ${fullname}
+📧 Email: ${email}
+📝 Subject: ${subject}
+💬 Message: ${message}
+    `;
+
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: text,
+                parse_mode: "HTML"
+            })
+        });
+
+        return await response.json();
+
+    } catch (error) {
+        console.error("Telegram error:", error);
+    }
+}
+
 /**
  * Initialize contact form handling
  */
@@ -59,7 +103,7 @@ function initContactForm() {
 /**
  * Handle form submission
  */
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
     const fullname = document.getElementById('fullname').value.trim();
@@ -67,23 +111,24 @@ function handleFormSubmit(e) {
     const subject = document.getElementById('subject').value.trim();
     const message = document.getElementById('message').value.trim();
 
-    // Validate form
     if (!fullname || !email || !subject || !message) {
         alert('Please fill in all required fields');
         return;
     }
 
-    // Validate email format
     if (!isValidEmail(email)) {
         alert('Please enter a valid email address');
         return;
     }
 
-    // Show success message
-    showSuccessMessage(fullname, email);
+   const result = await sendToTelegram(fullname, email, subject, message);
 
-    // Reset form
-    e.target.reset();
+    if (result && result.ok) {
+        showSuccessMessage(fullname, email);
+        e.target.reset();
+    } else {
+        alert("Сообщение не отправлено. Попробуй позже.");
+    }
 }
 
 /**
