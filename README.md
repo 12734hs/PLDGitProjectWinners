@@ -7,7 +7,7 @@ https://t.me/hlbt_pld
 
 Welcome to our site where you can get all information about us as a team, learn more about our projects, meet our members, and contact us anytime.
 
-## 📌 About
+## 📌 Message System
 
 When you fill in the form and press the submit button, all entered information is automatically sent to the Telegram channel above.
 
